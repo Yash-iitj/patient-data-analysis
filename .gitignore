@@ -1,2 +1,4 @@
 __pycache__/
 *.py[cod]
+data/final_data_big.csv
+saved_models/*.*

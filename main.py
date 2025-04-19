@@ -47,8 +47,6 @@ while choice != 6:
         os.system('CLS')
     elif choice == 5:
         interface()
-        input("Press enter to continue...")
-        os.system('CLS')
     elif choice == 6:
         print("Exiting Project...")
         break
