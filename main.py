@@ -28,17 +28,27 @@ while choice != 6:
         encounters()
         print("Preprocessing patients.csv")
         patients()
+        input("Press enter to continue...")
+        os.system('CLS')
     elif choice == 2:
         print("Running Data Merging...")
         merge()
+        input("Press enter to continue...")
+        os.system('CLS')
     elif choice == 3:
         print("Generating Synthetic Data...")
         generate()
+        input("Press enter to continue...")
+        os.system('CLS')
     elif choice == 4:
         print("Training Models and Outputting Metrics...")
         train_and_evaluate()
+        input("Press enter to continue...")
+        os.system('CLS')
     elif choice == 5:
         interface()
+        input("Press enter to continue...")
+        os.system('CLS')
     elif choice == 6:
         print("Exiting Project...")
         break

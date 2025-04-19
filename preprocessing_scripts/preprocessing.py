@@ -48,9 +48,9 @@ def conditions():
     df.to_csv('./data/conditions.csv', index=False)
 
 def merge():
-    patients_df = pd.read_csv('./data/base_data/patients.csv')
-    conditions_df = pd.read_csv('./data/base_data/conditions.csv')
-    encounters_df = pd.read_csv('./data/base_data/encounters.csv')
+    patients_df = pd.read_csv('./data/patients.csv')
+    conditions_df = pd.read_csv('./data/conditions.csv')
+    encounters_df = pd.read_csv('./data/encounters.csv')
     merged = encounters_df.merge(patients_df, left_on='PATIENT', right_on='Id', how='left')
     merged.drop(columns=['Id_y'], inplace=True)  # drop duplicate patient Id
     merged.rename(columns={'Id_x': 'ENCOUNTER_ID'}, inplace=True)  # rename for clarity
