@@ -1,0 +1,64 @@
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+from datetime import datetime
+
+def patients():
+    df = pd.read_csv("./data/base_data/patients.csv")
+    df.drop(columns=["SSN", 'DRIVERS', 'PASSPORT', 'PREFIX','FIRST', 'MIDDLE', 'LAST', 'SUFFIX', 'MAIDEN','BIRTHPLACE', 'ADDRESS', 'CITY', 'STATE','COUNTY',    'FIPS', 'ZIP', 'LAT', 'LON'], inplace=True)
+    df['IS_DEAD'] = df['DEATHDATE'].notna().astype(int)
+    df.drop('DEATHDATE', inplace=True, axis=1)
+    df['MARITAL'] = df['MARITAL'].map({'W': 1, 'D': 2, 'S': 3, 'M': 4}).fillna(0).astype(int)
+    df['GENDER'] = df['GENDER'].map({'M': 0, 'F': 1}).fillna(2).astype(int)
+    df['ETHNICITY'] = df['ETHNICITY'].map({'hispanic': 1,'nonhispanic': 2}).fillna(0).astype(int)
+    df['RACE'] = df['RACE'].map({'white': 1,'black': 2,'asian': 3,'native': 4,'other': 5}).fillna(0).astype(int)
+    df['BIRTHDATE'] = pd.to_datetime(df['BIRTHDATE'], errors='coerce')
+    today = pd.Timestamp(datetime.today())
+    df['AGE'] = ((today - df['BIRTHDATE']).dt.days / 365.25).astype(int)
+    df.drop(columns=['BIRTHDATE'], inplace=True)
+    df.to_csv("./data/patients.csv", index=False)
+
+def encounters():
+    df = pd.read_csv("./data/base_data/encounters.csv")
+    df.drop(columns=['STOP', 'REASONDESCRIPTION', 'DESCRIPTION'], inplace=True)
+    df.rename(columns={'START': 'DATE'}, inplace=True)
+    df['DATE'] = pd.to_datetime(df['DATE']).dt.date
+    def label_encode_with_nan(df, column, max_labels):
+        encoder = LabelEncoder()
+        notna_mask = df[column].notna()
+        encoded = pd.Series(np.zeros(len(df), dtype=np.int64))
+        encoded[notna_mask] = encoder.fit_transform(df.loc[notna_mask, column]) + 1
+        if encoded.max() > max_labels:
+            print(f"Warning: {column} has more than {max_labels} unique labels.")
+        return encoded
+    
+    df['ORGANIZATION'] = label_encode_with_nan(df, 'ORGANIZATION', 251)
+    df['PROVIDER'] = label_encode_with_nan(df, 'PROVIDER', 251)
+    df['PAYER'] = label_encode_with_nan(df, 'PAYER', 10)
+    df['CODE'] = label_encode_with_nan(df, 'CODE', 46)
+    encounter_class_map = {'urgentcare': 1,'emergency': 2,'ambulatory': 3,'inpatient': 4,'outpatient': 5,'wellness': 6,'snf': 7,'home': 8,'virtual': 9,'hospice':   10}
+    df['ENCOUNTERCLASS'] = df['ENCOUNTERCLASS'].map(encounter_class_map).fillna(0).astype(int)
+    df.to_csv('./data/encounters.csv', index=False)
+
+def conditions():
+    df = pd.read_csv('./data/base_data/conditions.csv')
+    df.drop(columns=['SYSTEM', 'STOP', 'DESCRIPTION'], inplace=True)
+    df.rename(columns={'CODE': 'CONDITION', 'START': 'DATE'}, inplace=True)
+    df['DATE'] = pd.to_datetime(df['DATE']).dt.date
+    df.to_csv('./data/conditions.csv', index=False)
+
+def merge():
+    patients_df = pd.read_csv('./data/base_data/patients.csv')
+    conditions_df = pd.read_csv('./data/base_data/conditions.csv')
+    encounters_df = pd.read_csv('./data/base_data/encounters.csv')
+    merged = encounters_df.merge(patients_df, left_on='PATIENT', right_on='Id', how='left')
+    merged.drop(columns=['Id_y'], inplace=True)  # drop duplicate patient Id
+    merged.rename(columns={'Id_x': 'ENCOUNTER_ID'}, inplace=True)  # rename for clarity
+    final_df = conditions_df.merge(merged, left_on=['ENCOUNTER', 'PATIENT'], right_on=['ENCOUNTER_ID', 'PATIENT'], how='left')
+    final_df.rename(columns={'DATE_x': 'DATE_CONDITION', 'DATE_y': 'DATE_ENCOUNTER'}, inplace=True)
+    final_df['PAYER_COVERAGE'] = pd.to_numeric(final_df['PAYER_COVERAGE'], errors='coerce').fillna(0)
+    final_df['HEALTHCARE_COVERAGE'] = pd.to_numeric(final_df['HEALTHCARE_COVERAGE'], errors='coerce').fillna(0)
+    final_df['INCOME'] = pd.to_numeric(final_df['INCOME'], errors='coerce').fillna(0)
+    final_df.drop(columns=['REASONCODE', 'PATIENT', 'ENCOUNTER', 'ENCOUNTER_ID', 'DATE_CONDITION', 'DATE_ENCOUNTER'], inplace=True)
+    final_df.to_csv('./data/final_data_small.csv', index=False)
+    print(final_df.head())
