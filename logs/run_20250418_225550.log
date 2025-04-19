@@ -1,0 +1,12 @@
+2025-04-18 22:55:50,513 - __main__ - INFO - Starting pipeline with fixed parameters
+2025-04-18 22:55:50,513 - __main__ - INFO - Running big data pipeline with deep learning
+2025-04-18 22:55:50,513 - __main__ - INFO - Running big data pipeline with deep learning
+2025-04-18 22:55:50,513 - __main__ - ERROR - Big data directory not found at ../data/data
+2025-04-18 22:55:50,513 - __main__ - ERROR - An error occurred: Big data directory not found at ../data/data
+Traceback (most recent call last):
+  File "/Users/yash/Downloads/final/run_all_models.py", line 52, in main
+    results = run_big_data_pipeline(args)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Downloads/final/run_all_models.py", line 71, in run_big_data_pipeline
+    raise FileNotFoundError(f"Big data directory not found at {args.big_data_dir}")
+FileNotFoundError: Big data directory not found at ../data/data

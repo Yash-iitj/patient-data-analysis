@@ -1,0 +1,94 @@
+2025-04-19 13:37:48,155 - __main__ - INFO - Starting pipeline with fixed parameters
+2025-04-19 13:37:48,155 - __main__ - INFO - Running big data pipeline with deep learning
+2025-04-19 13:37:48,155 - __main__ - INFO - Running big data pipeline with deep learning
+2025-04-19 13:37:48,479 - root - WARNING - TensorFlow not available. Deep learning models will be skipped.
+2025-04-19 13:37:48,479 - src.big_data_processor - WARNING - TensorFlow is not available. Deep learning is disabled.
+2025-04-19 13:37:48,479 - src.big_data_processor - INFO - Loading big data files...
+2025-04-19 13:37:48,533 - src.big_data_processor - INFO - Loaded 10600 patients
+2025-04-19 13:37:48,719 - src.big_data_processor - INFO - Loaded 53034 encounters
+2025-04-19 13:37:48,870 - src.big_data_processor - INFO - Loaded 106169 conditions
+2025-04-19 13:37:48,870 - src.big_data_processor - INFO - Preprocessing data...
+2025-04-19 13:37:49,047 - src.big_data_processor - INFO - Preprocessing complete
+2025-04-19 13:37:49,048 - src.big_data_processor - INFO - Identifying patient drop-offs...
+2025-04-19 13:38:45,005 - src.big_data_processor - INFO - Identified 5827 drop-offs out of 10531 patients (55.33%)
+2025-04-19 13:38:45,007 - src.big_data_processor - INFO - Extracting features...
+2025-04-19 13:38:45,109 - src.big_data_processor - INFO - Extracted 41 features for 10531 patients
+2025-04-19 13:38:45,120 - enhanced_processor - INFO - Training set: 8424 samples, Testing set: 2107 samples
+2025-04-19 13:38:45,120 - enhanced_processor - INFO - Drop-off rate in training set: 55.33%
+2025-04-19 13:38:45,120 - enhanced_processor - INFO - Drop-off rate in testing set: 55.34%
+2025-04-19 13:38:45,121 - enhanced_processor - INFO - Training logistic_regression...
+2025-04-19 13:38:45,678 - enhanced_processor - WARNING - Could not calculate feature importance for logistic_regression: A sparse matrix was passed, but dense data is required. Use X.toarray() to convert to a dense numpy array.
+2025-04-19 13:38:45,678 - enhanced_processor - INFO - logistic_regression results:
+2025-04-19 13:38:45,678 - enhanced_processor - INFO -   - Accuracy: 0.5505
+2025-04-19 13:38:45,678 - enhanced_processor - INFO -   - Precision: 0.5840
+2025-04-19 13:38:45,678 - enhanced_processor - INFO -   - Recall: 0.6527
+2025-04-19 13:38:45,678 - enhanced_processor - INFO -   - F1 Score: 0.6164
+2025-04-19 13:38:45,678 - enhanced_processor - INFO -   - ROC AUC: 0.5701
+2025-04-19 13:38:45,678 - enhanced_processor - INFO -   - PR AUC: 0.6195
+2025-04-19 13:38:45,678 - enhanced_processor - INFO - Classification Report for logistic_regression:
+2025-04-19 13:38:45,683 - enhanced_processor - INFO -               precision    recall  f1-score   support
+
+       False       0.50      0.42      0.46       941
+        True       0.58      0.65      0.62      1166
+
+    accuracy                           0.55      2107
+   macro avg       0.54      0.54      0.54      2107
+weighted avg       0.54      0.55      0.55      2107
+
+2025-04-19 13:38:45,683 - enhanced_processor - INFO - Confusion Matrix for logistic_regression:
+2025-04-19 13:38:45,683 - enhanced_processor - INFO - [[399 542]
+ [405 761]]
+2025-04-19 13:38:46,018 - enhanced_processor - INFO - Training random_forest...
+2025-04-19 13:38:52,944 - enhanced_processor - INFO - random_forest results:
+2025-04-19 13:38:52,944 - enhanced_processor - INFO -   - Accuracy: 0.5577
+2025-04-19 13:38:52,944 - enhanced_processor - INFO -   - Precision: 0.5757
+2025-04-19 13:38:52,944 - enhanced_processor - INFO -   - Recall: 0.7633
+2025-04-19 13:38:52,945 - enhanced_processor - INFO -   - F1 Score: 0.6563
+2025-04-19 13:38:52,945 - enhanced_processor - INFO -   - ROC AUC: 0.5707
+2025-04-19 13:38:52,945 - enhanced_processor - INFO -   - PR AUC: 0.6147
+2025-04-19 13:38:52,945 - enhanced_processor - INFO - Classification Report for random_forest:
+2025-04-19 13:38:52,949 - enhanced_processor - INFO -               precision    recall  f1-score   support
+
+       False       0.51      0.30      0.38       941
+        True       0.58      0.76      0.66      1166
+
+    accuracy                           0.56      2107
+   macro avg       0.54      0.53      0.52      2107
+weighted avg       0.55      0.56      0.53      2107
+
+2025-04-19 13:38:52,949 - enhanced_processor - INFO - Confusion Matrix for random_forest:
+2025-04-19 13:38:52,949 - enhanced_processor - INFO - [[285 656]
+ [276 890]]
+2025-04-19 13:38:53,090 - enhanced_processor - INFO - Training gradient_boosting...
+2025-04-19 13:39:04,829 - enhanced_processor - INFO - gradient_boosting results:
+2025-04-19 13:39:04,829 - enhanced_processor - INFO -   - Accuracy: 0.5871
+2025-04-19 13:39:04,829 - enhanced_processor - INFO -   - Precision: 0.6000
+2025-04-19 13:39:04,829 - enhanced_processor - INFO -   - Recall: 0.7616
+2025-04-19 13:39:04,829 - enhanced_processor - INFO -   - F1 Score: 0.6712
+2025-04-19 13:39:04,829 - enhanced_processor - INFO -   - ROC AUC: 0.6080
+2025-04-19 13:39:04,829 - enhanced_processor - INFO -   - PR AUC: 0.6482
+2025-04-19 13:39:04,829 - enhanced_processor - INFO - Classification Report for gradient_boosting:
+2025-04-19 13:39:04,834 - enhanced_processor - INFO -               precision    recall  f1-score   support
+
+       False       0.56      0.37      0.45       941
+        True       0.60      0.76      0.67      1166
+
+    accuracy                           0.59      2107
+   macro avg       0.58      0.57      0.56      2107
+weighted avg       0.58      0.59      0.57      2107
+
+2025-04-19 13:39:04,834 - enhanced_processor - INFO - Confusion Matrix for gradient_boosting:
+2025-04-19 13:39:04,834 - enhanced_processor - INFO - [[349 592]
+ [278 888]]
+2025-04-19 13:39:04,976 - enhanced_processor - INFO - Deep learning is disabled, skipping TensorFlow model
+2025-04-19 13:39:04,976 - enhanced_processor - INFO - Best model: gradient_boosting with ROC AUC = 0.6080
+2025-04-19 13:39:04,977 - src.big_data_processor - INFO - Pipeline complete
+2025-04-19 13:39:04,977 - __main__ - INFO - Big data pipeline complete. Results:
+2025-04-19 13:39:04,977 - __main__ - INFO -   - accuracy: 0.5651
+2025-04-19 13:39:04,977 - __main__ - INFO -   - precision: 0.5866
+2025-04-19 13:39:04,977 - __main__ - INFO -   - recall: 0.7258
+2025-04-19 13:39:04,977 - __main__ - INFO -   - f1_score: 0.6480
+2025-04-19 13:39:04,978 - __main__ - INFO -   - roc_auc: 0.5829
+2025-04-19 13:39:04,978 - __main__ - INFO -   - pr_auc: 0.6275
+2025-04-19 13:39:04,989 - __main__ - INFO - Generating comparison plots
+2025-04-19 13:39:06,134 - __main__ - INFO - Pipeline completed successfully
