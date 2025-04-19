@@ -20,7 +20,7 @@ while choice != 6:
     choice = int(input("Enter your choice here: "))
     print("".center(80, '='))
 
-    if choice == '1':
+    if choice == 1:
         print("Running Pre-processing...")
         print("Preprocessing conditions.csv")
         conditions()
@@ -28,18 +28,18 @@ while choice != 6:
         encounters()
         print("Preprocessing patients.csv")
         patients()
-    elif choice == '2':
+    elif choice == 2:
         print("Running Data Merging...")
         merge()
-    elif choice == '3':
+    elif choice == 3:
         print("Generating Synthetic Data...")
         generate()
-    elif choice == '4':
+    elif choice == 4:
         print("Training Models and Outputting Metrics...")
         train_and_evaluate()
-    elif choice == '5':
+    elif choice == 5:
         interface()
-    elif choice == '6':
+    elif choice == 6:
         print("Exiting Project...")
         break
     else:
