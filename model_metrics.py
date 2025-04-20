@@ -77,7 +77,7 @@ def evaluate_model():
 
     # Save summary metrics
     results_df = pd.DataFrame(results).T
-    results_df.to_csv('./model_visualizations/model_results.csv')
+    results_df.to_csv('./model_results/model_results.csv')
 
     print(results_df)
 
