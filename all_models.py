@@ -71,6 +71,11 @@ def train_spark():
         }
 
         print(f"{name}: Accuracy = {acc:.4f}, AUC = {auc:.4f}")
+        
+        # Save model
+        model_path = f'./saved_models/{name}'
+        model.write().overwrite().save(model_path)
+        print(f"Saved model to {model_path}")
 
     # Save results
     results_df = pd.DataFrame(metrics).T

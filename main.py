@@ -65,6 +65,7 @@ while choice != 8:
         clrscr()
     elif choice == 7:
         interface()
+        break
     elif choice == 8:
         print("Exiting Project...")
         break

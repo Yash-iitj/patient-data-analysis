@@ -58,35 +58,41 @@
           {% for field in fields %}
             <div class="col-md-6 mb-3">
               {% set label = field.replace('_', ' ').title() %}
-      
+              
               {% if field == 'ENCOUNTERCLASS' %}
                 <label class="form-label">Encounter Class (Select type)</label>
                 <select name="{{ field }}" class="form-select" required>
                   {% for option in dropdown_options['ENCOUNTERCLASS'] %}
-                    <option value="{{ option }}">{{ option }}</option>
+                    <option value="{{ option }}" {% if request.form.get(field) == option %}selected{% endif %}>
+                      {{ option }}
+                    </option>
                   {% endfor %}
                 </select>
-      
+
               {% elif field == 'CONDITION' %}
                 <label class="form-label">Condition (SNOMED Code or Label Encoded)</label>
-                <input type="number" name="{{ field }}" class="form-control" min="0" step="1" required>
-      
+                <input type="number" name="{{ field }}" class="form-control" min="0" step="1"
+                       value="{{ request.form.get(field, '') }}" required>
+
               {% elif field in dropdown_options %}
                 <label class="form-label">{{ label }} (Choose one)</label>
                 <select name="{{ field }}" class="form-select" required>
                   {% for option in dropdown_options[field] %}
-                    <option value="{{ option }}">{{ option }}</option>
+                    <option value="{{ option }}" {% if request.form.get(field) == option %}selected{% endif %}>
+                      {{ option }}
+                    </option>
                   {% endfor %}
                 </select>
-      
+
               {% else %}
                 <label class="form-label">{{ label }}</label>
-                <input type="number" step="any" name="{{ field }}" class="form-control" required>
+                <input type="number" step="any" name="{{ field }}" class="form-control"
+                       value="{{ request.form.get(field, '') }}" required>
               {% endif %}
             </div>
           {% endfor %}
         </div>
-      
+
         <button type="submit" class="btn btn-primary w-100">Predict</button>
       </form>
 
