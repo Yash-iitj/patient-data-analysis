@@ -12,6 +12,8 @@ def clrscr():
     except:
         os.system('clear')
 
+app_called = False
+
 clrscr()
 choice = 1
 while choice != 8:
@@ -64,10 +66,13 @@ while choice != 8:
         input("Press enter to continue...")
         clrscr()
     elif choice == 7:
-        interface()
+        app_called = True
         break
     elif choice == 8:
         print("Exiting Project...")
         break
     else:
         print("Invalid choice. Try again.")
+
+if app_called:
+    interface()

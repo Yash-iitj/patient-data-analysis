@@ -1,4 +1,4 @@
 ,accuracy,roc_auc
-logistic_regression,1.0,1.0
-random_forest,0.9893,0.9995
-gradient_boosting,0.9897,0.9995
+logistic_regression,0.9999,1.0
+random_forest,0.9978,1.0
+gradient_boosting,0.9962,0.9999

@@ -4,11 +4,7 @@ import numpy as np
 from pyspark.sql import SparkSession
 from pyspark.ml import Pipeline
 from pyspark.ml.feature import VectorAssembler, StandardScaler
-from pyspark.ml.classification import (
-    LogisticRegression,
-    RandomForestClassifier,
-    GBTClassifier
-)
+from pyspark.ml.classification import LogisticRegression, RandomForestClassifier, GBTClassifier
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 
 def train_spark():
