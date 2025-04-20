@@ -1,8 +1,9 @@
 import os
 
-from preprocessing_scripts.preprocessing import conditions, encounters, patients, merge
+from preprocessing_scripts.preprocessing import conditions, encounters, patients, merge, label_dropoffs_by_kmeans
 from synthetic_data_generator.generator import generate
-from all_models import train_and_evaluate
+from all_models import train_spark
+from model_metrics import evaluate_model
 from app import interface
 
 def clrscr():
@@ -19,10 +20,11 @@ while choice != 6:
     print("You may choose which part of the project you wish to execute here".center(80))
     print("1. Pre-processing")
     print("2. Merging Data")
-    print("3. Generate Synthetic Data")
-    print("4. Train Models and Output Metrics")
-    print("5. View Interface for Predictions")
-    print("6. Exit")
+    print("3. Feature Engineering the DROP_OFF")
+    print("4. Generate Synthetic Data")
+    print("5. Train Models and Output Metrics")
+    print("6. View Interface for Predictions")
+    print("7. Exit")
     choice = int(input("Enter your choice here: "))
     print("".center(80, '='))
 
@@ -42,18 +44,26 @@ while choice != 6:
         input("Press enter to continue...")
         clrscr()
     elif choice == 3:
+        print("Labelling Data Using K-Means Clustering...")
+        label_dropoffs_by_kmeans()
+        input("Press enter to continue...")
+        clrscr()
+    elif choice == 4:
         print("Generating Synthetic Data...")
         generate()
         input("Press enter to continue...")
         clrscr()
-    elif choice == 4:
-        print("Training Models and Outputting Metrics...")
-        train_and_evaluate()
+    elif choice == 5:
+        print("Training Models...")
+        train_spark()
+        input("Press enter to continue...")
+        print("Outputting Metrics...")
+        evaluate_model()
         input("Press enter to continue...")
         clrscr()
-    elif choice == 5:
-        interface()
     elif choice == 6:
+        interface()
+    elif choice == 7:
         print("Exiting Project...")
         break
     else:

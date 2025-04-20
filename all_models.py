@@ -1,130 +1,81 @@
 import os
 import pandas as pd
 import numpy as np
-import logging
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-from joblib import dump
-from datetime import datetime
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
-from sklearn.impute import SimpleImputer
-from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score,
-    roc_auc_score, confusion_matrix, classification_report,
-    precision_recall_curve, auc
+from pyspark.sql import SparkSession
+from pyspark.ml import Pipeline
+from pyspark.ml.feature import VectorAssembler, StandardScaler
+from pyspark.ml.classification import (
+    LogisticRegression,
+    RandomForestClassifier,
+    GBTClassifier
 )
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from pyspark.ml.evaluation import BinaryClassificationEvaluator
 
-def train_and_evaluate():
-    os.makedirs('./saved_models', exist_ok=True)
-    os.makedirs('./model_visualizations', exist_ok=True)
+def train_spark():
+    os.makedirs('./model_results', exist_ok=True)
 
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
+    # Start Spark session
+    spark = SparkSession.builder \
+        .appName("ModelTraining") \
+        .config("spark.driver.memory", "6g") \
+        .config("spark.executor.memory", "4g") \
+        .getOrCreate()
 
     # Load dataset
-    choice_of_data = input("Enter 1 to use smaller dataset, 2 to use bigger dataset: ")
-    if choice_of_data == 1:
-        data_path = './data/final_data_small.csv'
-    else:
-        data_path = './data/final_data_big.csv'
-    df = pd.read_csv(data_path)
+    print("Choose the dataset to work on")
+    print("1. Small Dataset")
+    print("2. Big Dataset")
+    choice = input("Enter your choice here: ")
+    path = './data/final_data_small.csv' if choice == '1' else './data/final_data_big.csv'
 
-    # Add synthetic binary target
-    df['IS_DROPOFF'] = np.random.choice([0, 1], size=len(df), p=[0.8, 0.2])
+    # Load dataset WITHOUT overwriting label
+    df_pd = pd.read_csv(path)
+    if 'IS_DROPOFF' not in df_pd.columns:
+        raise ValueError("The dataset must contain an 'IS_DROPOFF' column.")
 
-    # Separate features and target
-    target = 'IS_DROPOFF'
-    drop_cols = ['IS_DROPOFF']
-    features = [col for col in df.columns if col not in drop_cols]
+    df = spark.createDataFrame(df_pd)
 
-    X = df[features]
-    y = df[target]
+    label = 'IS_DROPOFF'
+    features = [col for col in df.columns if col != label]
 
-    # Identify numeric columns (all in this case)
-    numeric = X.columns.tolist()
+    # Assemble + scale
+    assembler = VectorAssembler(inputCols=features, outputCol="features")
+    scaler = StandardScaler(inputCol="features", outputCol="scaledFeatures")
 
-    # Preprocessing pipeline
-    numeric_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='mean')),
-        ('scaler', StandardScaler())
-    ])
-
-    # Train-test split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, stratify=y
-    )
+    # Train/test split
+    train_data, test_data = df.randomSplit([0.8, 0.2], seed=42)
 
     # Models
     models = {
-        'logistic_regression': LogisticRegression(max_iter=1000),
-        'random_forest': RandomForestClassifier(n_estimators=100),
-        'gradient_boosting': GradientBoostingClassifier(n_estimators=100)
+        'logistic_regression': LogisticRegression(featuresCol='scaledFeatures', labelCol=label),
+        'random_forest': RandomForestClassifier(featuresCol='scaledFeatures', labelCol=label, numTrees=50, maxDepth=10),
+        'gradient_boosting': GBTClassifier(featuresCol='scaledFeatures', labelCol=label, maxIter=50)
     }
 
-    results = {}
+    evaluator = BinaryClassificationEvaluator(labelCol=label, rawPredictionCol="rawPrediction", metricName="areaUnderROC")
+    metrics = {}
 
-    # Training and evaluation
-    for name, model in models.items():
-        logger.info(f"Training model: {name}")
+    for name, classifier in models.items():
+        print(f"\nTraining {name}...")
 
-        pipeline = Pipeline([
-            ('preprocessor', numeric_transformer),
-            ('classifier', model)
-        ])
+        pipeline = Pipeline(stages=[assembler, scaler, classifier])
+        model = pipeline.fit(train_data)
+        predictions = model.transform(test_data)
 
-        pipeline.fit(X_train, y_train)
-        y_pred = pipeline.predict(X_test)
-        y_proba = pipeline.predict_proba(X_test)[:, 1]
+        auc = evaluator.evaluate(predictions)
+        acc = predictions.filter(predictions[label] == predictions["prediction"]).count() / predictions.count()
 
-        acc = accuracy_score(y_test, y_pred)
-        prec = precision_score(y_test, y_pred)
-        rec = recall_score(y_test, y_pred)
-        f1 = f1_score(y_test, y_pred)
-        roc = roc_auc_score(y_test, y_proba)
-        prc, rec_curve, _ = precision_recall_curve(y_test, y_proba)
-        pr_auc = auc(rec_curve, prc)
-        cm = confusion_matrix(y_test, y_pred)
-
-        logger.info(f"{name} -- Accuracy: {acc:.4f}, Precision: {prec:.4f}, Recall: {rec:.4f}, F1: {f1:.4f}, ROC AUC: {roc:.4f}, PR AUC: {pr_auc:.4f}")
-        logger.info(classification_report(y_test, y_pred))
-
-        # Save model
-        model_path = f'./saved_models/{name}_model.joblib'
-        dump(pipeline, model_path)
-
-        # Save confusion matrix
-        plt.figure(figsize=(6, 5))
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-        plt.title(f'Confusion Matrix - {name}')
-        plt.xlabel('Predicted')
-        plt.ylabel('Actual')
-        plt.savefig(f'./model_visualizations/confusion_matrix_{name}.png')
-        plt.close()
-
-        # Save PR Curve
-        plt.figure(figsize=(6, 5))
-        plt.plot(rec_curve, prc, label=f'PR AUC = {pr_auc:.3f}')
-        plt.xlabel('Recall')
-        plt.ylabel('Precision')
-        plt.title(f'Precision-Recall Curve - {name}')
-        plt.legend()
-        plt.savefig(f'./model_visualizations/pr_curve_{name}.png')
-        plt.close()
-
-        results[name] = {
-            'accuracy': acc,
-            'precision': prec,
-            'recall': rec,
-            'f1_score': f1,
-            'roc_auc': roc,
-            'pr_auc': pr_auc
+        metrics[name] = {
+            'accuracy': round(acc, 4),
+            'roc_auc': round(auc, 4)
         }
 
-    # Save summary
-    summary_path = './model_visualizations/model_results.csv'
-    pd.DataFrame(results).T.to_csv(summary_path)
+        print(f"{name}: Accuracy = {acc:.4f}, AUC = {auc:.4f}")
+
+    # Save results
+    results_df = pd.DataFrame(metrics).T
+    results_df.to_csv('./model_results/summary_metrics.csv')
+    print("\nSaved metrics to ./model_results/summary_metrics.csv")
+
+if __name__ == "__main__":
+    train_spark()
