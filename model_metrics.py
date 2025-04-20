@@ -76,9 +76,7 @@ def evaluate_model():
             print(f"Error loading {fname}: {e}")
 
     # Save summary metrics
-    results_df = pd.DataFrame(results).T
-    results_df.to_csv('./model_results/model_results.csv')
-
+    results_df = pd.read_csv('./model_results/summary_metrics.csv')
     print(results_df)
 
 if __name__ == '__main__':

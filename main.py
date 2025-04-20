@@ -14,7 +14,7 @@ def clrscr():
 
 clrscr()
 choice = 1
-while choice != 6:
+while choice != 8:
     print("Welcome to Project for Machine Learning with Big Data".center(80))
     print("".center(80, '='))
     print("You may choose which part of the project you wish to execute here".center(80))
