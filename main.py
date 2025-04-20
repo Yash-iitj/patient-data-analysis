@@ -5,7 +5,13 @@ from synthetic_data_generator.generator import generate
 from all_models import train_and_evaluate
 from app import interface
 
-os.system("CLS")
+def clrscr():
+    try:
+        os.system('CLS')
+    except:
+        os.system('clear')
+
+clrscr()
 choice = 1
 while choice != 6:
     print("Welcome to Project for Machine Learning with Big Data".center(80))
@@ -29,22 +35,22 @@ while choice != 6:
         print("Preprocessing patients.csv")
         patients()
         input("Press enter to continue...")
-        os.system('CLS')
+        clrscr()
     elif choice == 2:
         print("Running Data Merging...")
         merge()
         input("Press enter to continue...")
-        os.system('CLS')
+        clrscr()
     elif choice == 3:
         print("Generating Synthetic Data...")
         generate()
         input("Press enter to continue...")
-        os.system('CLS')
+        clrscr()
     elif choice == 4:
         print("Training Models and Outputting Metrics...")
         train_and_evaluate()
         input("Press enter to continue...")
-        os.system('CLS')
+        clrscr()
     elif choice == 5:
         interface()
     elif choice == 6:
