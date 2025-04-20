@@ -7,7 +7,7 @@ def generate():
     output_path = './data/final_data_big.csv'
     source_df = pd.read_csv(source_path)
 
-    columns = ['CONDITION', 'ORGANIZATION', 'PROVIDER', 'PAYER', 'ENCOUNTERCLASS', 'CODE','BASE_ENCOUNTER_COST', 'TOTAL_CLAIM_COST', 'PAYER_COVERAGE','MARITAL', 'RACE', 'ETHNICITY', 'GENDER','HEALTHCARE_EXPENSES', 'HEALTHCARE_COVERAGE', 'INCOME', 'IS_DEAD', 'AGE']
+    columns = ['CONDITION', 'ENCOUNTERCLASS', 'BASE_ENCOUNTER_COST', 'TOTAL_CLAIM_COST', 'PAYER_COVERAGE','MARITAL', 'RACE', 'ETHNICITY', 'GENDER','HEALTHCARE_EXPENSES', 'HEALTHCARE_COVERAGE', 'INCOME', 'AGE']
 
     source_df = source_df[columns]
     target_records = 1_000_000
@@ -20,7 +20,7 @@ def generate():
         for col in ['BASE_ENCOUNTER_COST', 'TOTAL_CLAIM_COST', 'PAYER_COVERAGE','HEALTHCARE_EXPENSES', 'HEALTHCARE_COVERAGE', 'INCOME']:
             sampled[col] *= np.random.uniform(0.85, 1.15, size=len(sampled))
         sampled['AGE'] = sampled['AGE'].apply(lambda x: min(100, max(0, int(x + np.random.randint(-3, 4)))))
-        for col in ['CONDITION', 'CODE', 'MARITAL', 'RACE', 'ETHNICITY', 'GENDER','ORGANIZATION', 'PROVIDER', 'PAYER', 'ENCOUNTERCLASS']:
+        for col in ['CONDITION', 'MARITAL', 'RACE', 'ETHNICITY', 'GENDER', 'ENCOUNTERCLASS']:
             sampled[col] = np.random.choice(source_df[col].dropna().unique(), size=len(sampled), replace=True)
         generated_rows.append(sampled)
 

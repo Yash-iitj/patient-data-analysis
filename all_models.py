@@ -56,14 +56,14 @@ def train_and_evaluate():
 
     # Train-test split
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
+        X, y, test_size=0.2, stratify=y
     )
 
     # Models
     models = {
-        'logistic_regression': LogisticRegression(max_iter=1000, random_state=42),
-        'random_forest': RandomForestClassifier(n_estimators=100, random_state=42),
-        'gradient_boosting': GradientBoostingClassifier(n_estimators=100, random_state=42)
+        'logistic_regression': LogisticRegression(max_iter=1000),
+        'random_forest': RandomForestClassifier(n_estimators=100),
+        'gradient_boosting': GradientBoostingClassifier(n_estimators=100)
     }
 
     results = {}

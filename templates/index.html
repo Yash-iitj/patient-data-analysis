@@ -58,35 +58,19 @@
           {% for field in fields %}
             <div class="col-md-6 mb-3">
               {% set label = field.replace('_', ' ').title() %}
-
-              {% if field == 'ORGANIZATION' %}
-                <label class="form-label">Organization (There are 251 organizations, encoded 0–250)</label>
-                <input type="number" name="{{ field }}" class="form-control" min="0" max="250" required>
-
-              {% elif field == 'PROVIDER' %}
-                <label class="form-label">Provider (There are 251 providers, encoded 0–250)</label>
-                <input type="number" name="{{ field }}" class="form-control" min="0" max="250" required>
-
-              {% elif field == 'PAYER' %}
-                <label class="form-label">Payer (There are 11 payers, encoded 0–10)</label>
-                <input type="number" name="{{ field }}" class="form-control" min="0" max="10" required>
-
-              {% elif field == 'ENCOUNTERCLASS' %}
+      
+              {% if field == 'ENCOUNTERCLASS' %}
                 <label class="form-label">Encounter Class (Select type)</label>
                 <select name="{{ field }}" class="form-select" required>
                   {% for option in dropdown_options['ENCOUNTERCLASS'] %}
                     <option value="{{ option }}">{{ option }}</option>
                   {% endfor %}
                 </select>
-
-              {% elif field == 'CODE' %}
-                <label class="form-label">Encounter Code (46 codes, encoded 0–45)</label>
-                <input type="number" name="{{ field }}" class="form-control" min="0" max="45" required>
-
+      
               {% elif field == 'CONDITION' %}
                 <label class="form-label">Condition (SNOMED Code or Label Encoded)</label>
                 <input type="number" name="{{ field }}" class="form-control" min="0" step="1" required>
-
+      
               {% elif field in dropdown_options %}
                 <label class="form-label">{{ label }} (Choose one)</label>
                 <select name="{{ field }}" class="form-select" required>
@@ -94,7 +78,7 @@
                     <option value="{{ option }}">{{ option }}</option>
                   {% endfor %}
                 </select>
-
+      
               {% else %}
                 <label class="form-label">{{ label }}</label>
                 <input type="number" step="any" name="{{ field }}" class="form-control" required>
@@ -102,7 +86,7 @@
             </div>
           {% endfor %}
         </div>
-
+      
         <button type="submit" class="btn btn-primary w-100">Predict</button>
       </form>
 

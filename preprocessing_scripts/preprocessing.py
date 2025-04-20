@@ -5,8 +5,7 @@ from datetime import datetime
 
 def patients():
     df = pd.read_csv("./data/base_data/patients.csv")
-    df.drop(columns=["SSN", 'DRIVERS', 'PASSPORT', 'PREFIX','FIRST', 'MIDDLE', 'LAST', 'SUFFIX', 'MAIDEN','BIRTHPLACE', 'ADDRESS', 'CITY', 'STATE','COUNTY',    'FIPS', 'ZIP', 'LAT', 'LON'], inplace=True)
-    df['IS_DEAD'] = df['DEATHDATE'].notna().astype(int)
+    df.drop(columns=["SSN", 'DRIVERS', 'PASSPORT', 'PREFIX','FIRST', 'MIDDLE', 'LAST', 'SUFFIX', 'MAIDEN','BIRTHPLACE', 'ADDRESS', 'CITY', 'STATE','COUNTY', 'FIPS', 'ZIP', 'LAT', 'LON'], inplace=True)
     df.drop('DEATHDATE', inplace=True, axis=1)
     df['MARITAL'] = df['MARITAL'].map({'W': 1, 'D': 2, 'S': 3, 'M': 4}).fillna(0).astype(int)
     df['GENDER'] = df['GENDER'].map({'M': 0, 'F': 1}).fillna(2).astype(int)
@@ -20,22 +19,9 @@ def patients():
 
 def encounters():
     df = pd.read_csv("./data/base_data/encounters.csv")
-    df.drop(columns=['STOP', 'REASONDESCRIPTION', 'DESCRIPTION'], inplace=True)
+    df.drop(columns=['STOP', 'REASONDESCRIPTION', 'DESCRIPTION','ORGANIZATION','PROVIDER','PAYER','CODE'], inplace=True)
     df.rename(columns={'START': 'DATE'}, inplace=True)
     df['DATE'] = pd.to_datetime(df['DATE']).dt.date
-    def label_encode_with_nan(df, column, max_labels):
-        encoder = LabelEncoder()
-        notna_mask = df[column].notna()
-        encoded = pd.Series(np.zeros(len(df), dtype=np.int64))
-        encoded[notna_mask] = encoder.fit_transform(df.loc[notna_mask, column]) + 1
-        if encoded.max() > max_labels:
-            print(f"Warning: {column} has more than {max_labels} unique labels.")
-        return encoded
-    
-    df['ORGANIZATION'] = label_encode_with_nan(df, 'ORGANIZATION', 251)
-    df['PROVIDER'] = label_encode_with_nan(df, 'PROVIDER', 251)
-    df['PAYER'] = label_encode_with_nan(df, 'PAYER', 10)
-    df['CODE'] = label_encode_with_nan(df, 'CODE', 46)
     encounter_class_map = {'urgentcare': 1,'emergency': 2,'ambulatory': 3,'inpatient': 4,'outpatient': 5,'wellness': 6,'snf': 7,'home': 8,'virtual': 9,'hospice':   10}
     df['ENCOUNTERCLASS'] = df['ENCOUNTERCLASS'].map(encounter_class_map).fillna(0).astype(int)
     df.to_csv('./data/encounters.csv', index=False)
@@ -52,8 +38,8 @@ def merge():
     conditions_df = pd.read_csv('./data/conditions.csv')
     encounters_df = pd.read_csv('./data/encounters.csv')
     merged = encounters_df.merge(patients_df, left_on='PATIENT', right_on='Id', how='left')
-    merged.drop(columns=['Id_y'], inplace=True)  # drop duplicate patient Id
-    merged.rename(columns={'Id_x': 'ENCOUNTER_ID'}, inplace=True)  # rename for clarity
+    merged.drop(columns=['Id_y'], inplace=True)
+    merged.rename(columns={'Id_x': 'ENCOUNTER_ID'}, inplace=True)
     final_df = conditions_df.merge(merged, left_on=['ENCOUNTER', 'PATIENT'], right_on=['ENCOUNTER_ID', 'PATIENT'], how='left')
     final_df.rename(columns={'DATE_x': 'DATE_CONDITION', 'DATE_y': 'DATE_ENCOUNTER'}, inplace=True)
     final_df['PAYER_COVERAGE'] = pd.to_numeric(final_df['PAYER_COVERAGE'], errors='coerce').fillna(0)
