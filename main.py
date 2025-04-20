@@ -22,9 +22,10 @@ while choice != 6:
     print("2. Merging Data")
     print("3. Feature Engineering the DROP_OFF")
     print("4. Generate Synthetic Data")
-    print("5. Train Models and Output Metrics")
-    print("6. View Interface for Predictions")
-    print("7. Exit")
+    print("5. Train Models")
+    print("6. Output Metrics")
+    print("7. View Interface for Predictions")
+    print("8. Exit")
     choice = int(input("Enter your choice here: "))
     print("".center(80, '='))
 
@@ -57,13 +58,14 @@ while choice != 6:
         print("Training Models...")
         train_spark()
         input("Press enter to continue...")
+    elif choice == 6:
         print("Outputting Metrics...")
         evaluate_model()
         input("Press enter to continue...")
         clrscr()
-    elif choice == 6:
-        interface()
     elif choice == 7:
+        interface()
+    elif choice == 8:
         print("Exiting Project...")
         break
     else:
